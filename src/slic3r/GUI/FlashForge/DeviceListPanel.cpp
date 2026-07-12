@@ -240,13 +240,16 @@ void DeviceItemPanel::do_render(wxDC& dc)
     wxSize sz = GetSize();
     wxPen  pen;
     pen.SetWidth(2);
-    dc.SetBrush(m_bg_color);
+    // #35 dark mode: read theme-aware colors at paint time so the custom-drawn device
+    // cards darken with the app (their child widgets are re-themed by the recursion, but
+    // this fill/border is drawn by hand and must be converted explicitly).
+    dc.SetBrush(StateColor::darkModeColorFor(m_bg_color));
     if (m_hovered && m_pressed) {
         pen.SetColour(m_border_press_color);
     } else if (m_hovered) {
         pen.SetColour(m_border_hover_color);
     } else {
-        pen.SetColour(m_border_color);
+        pen.SetColour(StateColor::darkModeColorFor(m_border_color));
     }
     dc.SetPen(pen);
     dc.DrawRoundedRectangle(1, 1, sz.x-1, sz.y-1, 7);
@@ -596,7 +599,9 @@ DeviceListPanel::DeviceListPanel(wxWindow* parent, wxWindowID id, const wxPoint&
     : wxPanel(parent, id, pos, size, wxTAB_TRAVERSAL)
     , m_filter_popup(new DeviceFilterPopupWindow(this))
 {
-    this->SetBackgroundColour(0xEEEEEE);
+    // #35 dark mode: theme-aware background (converted on toggle by the Monitor recursion,
+    // and correct here if constructed while already in dark mode)
+    this->SetBackgroundColour(StateColor::darkModeColorFor(wxColour(0xEEEEEE)));
 
     build();
     connectEvent();
@@ -620,7 +625,7 @@ void DeviceListPanel::build()
     m_default_filter_item = new DeviceFilterItem(m_filter_popup, _L("All"), true);
     m_default_filter_item->Bind(EVT_DEVICE_FILTER_ITEM_CLICKED, &DeviceListPanel::onFilterItemClicked, this);
     m_default_filter_item->Show(false);
-    SetBackgroundColour(wxColour("#F0F0F0"));
+    SetBackgroundColour(StateColor::darkModeColorFor(wxColour("#F0F0F0"))); // #35 dark mode
     m_placement_btn = new DropDownButton(this, _L("All"), create_scaled_bitmap("device_dropdown", this, 8));
     m_status_btn  = new DropDownButton(this, _L("Status"), create_scaled_bitmap("device_dropdown", this, 8));
     m_type_btn = new DropDownButton(this, _L("Machine Type"), create_scaled_bitmap("device_dropdown", this, 8));

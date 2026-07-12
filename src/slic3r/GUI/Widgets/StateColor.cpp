@@ -43,6 +43,9 @@ static std::map<wxColour, wxColour> gDarkColors{
     // ORCA
     {"#BFE1DE", "#223C3C"}, // rgb(191, 225, 222)  Dropdown checked item background color > ORCA color with %25 opacity
     {"#E5F0EE", "#283232"}, // rgb(229, 240, 238)  Combo / Dropdown focused background color > ORCA color with %10 opacity
+    // #35 dark mode: colors used by custom-painted panels (Header bar / Device tab)
+    {"#FAFAFA", "#2D2D30"}, // rgb(250, 250, 250)  BBLTopbar header background (was hardcoded light)
+    {"#D9EAFF", "#2E3A4A"}, // rgb(217, 234, 255)  FileItem pressed highlight fill (Device tab file list)
 };
 
 std::tuple<double, double, double> StateColor::GetLAB(const wxColour& color) {

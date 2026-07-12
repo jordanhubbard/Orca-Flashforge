@@ -18,6 +18,7 @@ public:
     ~BBLTopbar();
     void UpdateToolbarWidth(int width);
     void Rescale();
+    void sys_color_changed(); // #35 dark mode: repaint custom-drawn header on theme change
     void OnIconize(wxAuiToolBarEvent& event);
     void OnFullScreen(wxAuiToolBarEvent& event);
     void OnCloseFrame(wxAuiToolBarEvent& event);

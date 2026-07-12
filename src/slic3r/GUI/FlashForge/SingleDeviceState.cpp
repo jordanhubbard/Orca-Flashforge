@@ -962,8 +962,9 @@ void FileItem::doRender(wxDC& dc)
     dc.SetPen(*wxTRANSPARENT_PEN);
 
     if (m_pressed) {
-        dc.SetBrush(m_bg_color);
-        dc.SetPen(m_border_presse_color);
+        // #35 dark mode: theme-aware highlight fill/border for the custom-drawn file item
+        dc.SetBrush(StateColor::darkModeColorFor(m_bg_color));
+        dc.SetPen(StateColor::darkModeColorFor(m_border_presse_color));
         dc.DrawRectangle(0, 0, size.x, size.y);
     }
 
@@ -1029,7 +1030,8 @@ SingleDeviceState::SingleDeviceState(wxWindow* parent, wxWindowID id, const wxPo
         , m_download_title_image_task_id(FFDownloadTool::InvalidTaskId)
 {
     this->SetScrollRate(30, 30);
-    this->SetBackgroundColour(wxColour(240, 240, 240));
+    // #35 dark mode: theme-aware background so the Device status page darkens with the app
+    this->SetBackgroundColour(StateColor::darkModeColorFor(wxColour(240, 240, 240)));
     setupLayout();
     connectEvent();
     reInit();

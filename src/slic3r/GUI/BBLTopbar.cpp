@@ -43,11 +43,9 @@ public:
 void BBLTopbarArt::DrawLabel(wxDC& dc, wxWindow* wnd, const wxAuiToolBarItem& item, const wxRect& rect)
 {
     dc.SetFont(m_font);
-#ifdef __WINDOWS__
-    dc.SetTextForeground(wxColour("#333333"));
-#else
-    dc.SetTextForeground(*wxWHITE);
-#endif
+    // #35 dark mode: route header label text through the theme (dark #363636 in light
+    // mode, light gray in dark mode) instead of an unconditional white on non-Windows.
+    dc.SetTextForeground(StateColor::darkModeColorFor(wxColour("#363636")));
 
     int textWidth = 0, textHeight = 0;
     dc.GetTextExtent(item.GetLabel(), &textWidth, &textHeight);
@@ -70,7 +68,9 @@ void BBLTopbarArt::DrawLabel(wxDC& dc, wxWindow* wnd, const wxAuiToolBarItem& it
 
 void BBLTopbarArt::DrawBackground(wxDC& dc, wxWindow* wnd, const wxRect& rect)
 {
-    dc.SetBrush(wxBrush(wxColour(250, 250, 250)));
+    // #35 dark mode: route the header background through the theme so it darkens with
+    // the rest of the app (light #FAFAFA in light mode, dark in dark mode).
+    dc.SetBrush(wxBrush(StateColor::darkModeColorFor(wxColour(250, 250, 250))));
     dc.SetPen(*wxTRANSPARENT_PEN);
     wxRect clipRect = rect;
     clipRect.y -= 8;
@@ -165,11 +165,8 @@ void BBLTopbarArt::DrawButton(wxDC& dc, wxWindow* wnd, const wxAuiToolBarItem& i
         dc.DrawBitmap(bmp, bmpX, bmpY, true);
 
     // set the item's text color based on if it is disabled
-#ifdef __WINDOWS__
-    dc.SetTextForeground(wxColour("#333333"));
-#else
-    dc.SetTextForeground(*wxWHITE);
-#endif
+    // #35 dark mode: theme-aware button text (dark in light mode, light in dark mode)
+    dc.SetTextForeground(StateColor::darkModeColorFor(wxColour("#363636")));
     if (item.GetState() & wxAUI_BUTTON_STATE_DISABLED)
     {
         dc.SetTextForeground(wxColour("#999999"));
@@ -342,6 +339,16 @@ void BBLTopbar::show_publish_button(bool show)
 {
     this->EnableTool(m_publish_item->GetId(), show);
     Refresh();
+}
+
+// #35 dark mode: the header is drawn by a custom art provider / OnPaint that reads the
+// theme colors at paint time, so re-theming the widget tree isn't enough - we must force
+// a repaint after the dark/light toggle so DrawBackground/DrawLabel pick up the new colors.
+void BBLTopbar::sys_color_changed()
+{
+    wxGetApp().UpdateDarkUI(this);
+    Refresh();
+    Update();
 }
 
 void BBLTopbar::OnSaveProject(wxAuiToolBarEvent& event)
