@@ -191,18 +191,21 @@ function build_slicer() {
     echo "Fix macOS app package..."
     (
         cd "$PROJECT_BUILD_DIR"
+        # The CMake product/bundle name is "Flash Studio" (see src/CMakeLists.txt),
+        # so the built bundle is "Flash Studio.app", not "Orca-Flashforge.app".
+        APP_BUNDLE="Flash Studio.app"
         mkdir -p Orca-Flashforge
         cd Orca-Flashforge
         # remove previously built app
-        rm -rf ./Orca-Flashforge.app
+        rm -rf "./$APP_BUNDLE"
         # fully copy newly built app
-        cp -pR "../src$BUILD_DIR_CONFIG_SUBDIR/Orca-Flashforge.app" ./Orca-Flashforge.app
+        cp -pR "../src$BUILD_DIR_CONFIG_SUBDIR/$APP_BUNDLE" "./$APP_BUNDLE"
         # fix resources
-        resources_path=$(readlink ./Orca-Flashforge.app/Contents/Resources)
-        rm ./Orca-Flashforge.app/Contents/Resources
-        cp -R "$resources_path" ./Orca-Flashforge.app/Contents/Resources
+        resources_path=$(readlink "./$APP_BUNDLE/Contents/Resources")
+        rm "./$APP_BUNDLE/Contents/Resources"
+        cp -R "$resources_path" "./$APP_BUNDLE/Contents/Resources"
         # delete .DS_Store file
-        find ./Orca-Flashforge.app/ -name '.DS_Store' -delete
+        find "./$APP_BUNDLE/" -name '.DS_Store' -delete
     )
 
     # extract version

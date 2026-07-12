@@ -287,6 +287,11 @@ if (NOT MSVC AND ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMP
     # we finally get rid of the deprecated code.
     if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
         add_compile_options(-Wno-deprecated-declarations)
+        # Newer Clang (e.g. Xcode 26 / clang 21) has removed some warning names that
+        # older code still passes (such as enum-constexpr-conversion below). Without
+        # this, an unknown -W flag becomes a hard error in targets built with -Werror
+        # (e.g. Clipper2). Tolerate unknown warning flags across the whole tree.
+        add_compile_options(-Wno-unknown-warning-option)
     endif()
 
     if((${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang") AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER 15)
@@ -554,6 +559,15 @@ endif ()
 find_package(PNG REQUIRED)
 
 set(OpenGL_GL_PREFERENCE "LEGACY")
+if(APPLE)
+    # A Homebrew "mesa" install (e.g. pulled in as a freeglut dependency) drops a
+    # libGL.dylib into /opt/homebrew/lib, which find_package(OpenGL) selects instead
+    # of the system framework. Mesa is not a valid GL provider for a native Cocoa app
+    # and it breaks linking, so pin OpenGL/GLU to the macOS OpenGL framework -- the
+    # same value FindOpenGL would choose in an environment without Homebrew mesa.
+    set(OPENGL_gl_LIBRARY  "/System/Library/Frameworks/OpenGL.framework" CACHE FILEPATH "" FORCE)
+    set(OPENGL_glu_LIBRARY "/System/Library/Frameworks/OpenGL.framework" CACHE FILEPATH "" FORCE)
+endif()
 find_package(OpenGL REQUIRED)
 
 set(GLEW_ROOT "${CMAKE_PREFIX_PATH}")

@@ -12,7 +12,10 @@ orcaslicer_add_cmake_project(OpenVDB
     URL_HASH SHA256=f353e7b99bd0cbfc27ac9082de51acf32a8bc0b3e21ff9661ecca6f205ec1d81
     DEPENDS dep_TBB dep_Blosc dep_OpenEXR dep_Boost
     CMAKE_ARGS
-        -DCMAKE_POSITION_INDEPENDENT_CODE=ON 
+        # clang 16+ errors on OpenVDB's spurious `.template`/`::template` uses
+        # (NodeManager.h). The keyword is a no-op here, so demote to non-fatal.
+        "-DCMAKE_CXX_FLAGS=-Wno-missing-template-arg-list-after-template-kw"
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON
         -DOPENVDB_BUILD_PYTHON_MODULE=OFF
         -DUSE_BLOSC=ON
         -DOPENVDB_CORE_SHARED=${_build_shared} 
