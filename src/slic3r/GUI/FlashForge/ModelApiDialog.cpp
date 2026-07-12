@@ -3213,7 +3213,7 @@ void ModelApi::ShowModelApi(wxWindow* parent)
         return;
     }
     try {
-        MultiComHelper::inst()->userClickCount("ai", ComTimeoutWanB);
+        // de-cloud: removed userClickCount("ai") telemetry beacon
         m_exist            = true;
         g_scoreRule        = std::make_shared<ScoreRule>();
         g_pipeline                      = std::make_shared<int>(0);

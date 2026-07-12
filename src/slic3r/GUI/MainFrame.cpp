@@ -490,7 +490,7 @@ DPIFrame(NULL, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, BORDERLESS_FRAME_
         this->shutdown();
         // propagate event
 
-        wxGetApp().start_report_tracking_data_exit_thread();
+        // de-cloud: removed start_report_tracking_data_exit_thread() exit telemetry beacon
         wxGetApp().remove_mall_system_dialog();
         event.Skip();
         BOOST_LOG_TRIVIAL(info) << __FUNCTION__<< ": mainframe finished process close_widow event";

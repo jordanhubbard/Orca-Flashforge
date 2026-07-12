@@ -908,7 +908,8 @@ bool FFWebViewPanel::InitBrowser()
 {
     m_homePageUrl = wxGetApp().app_config->get("home_page_url");
     if (m_homePageUrl.empty()) {
-        m_homePageUrl = "https://desktop.voxelshare.com";
+        // de-cloud: do not auto-load remote voxelshare home page at startup
+        m_homePageUrl = "about:blank";
     }
     wxString language = wxGetApp().current_language_code_safe().BeforeFirst('_');
     m_mainBrowser = WebView::CreateWebView(this, wxString::Format("%s?lang=%s", m_homePageUrl, language));
@@ -1283,6 +1284,8 @@ void FFWebViewPanel::MoveViewNowWindow()
 
 void FFWebViewPanel::ReportTrackingData(const std::string &eventType, const std::string &eventName)
 {
+    // de-cloud: no telemetry beacon for model detail tracking
+    return;
     std::string uuid = boost::uuids::to_string(boost::uuids::random_generator()());
     uuid.erase(std::remove(uuid.begin(), uuid.end(), '-'), uuid.end());
     std::string timestamp = FFUtils::getTimestampMsStr();

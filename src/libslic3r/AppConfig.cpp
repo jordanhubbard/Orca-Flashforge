@@ -39,7 +39,8 @@ using namespace nlohmann;
 
 namespace Slic3r {
 
-static const std::string VERSION_CHECK_URL = "http://www.ishare3d.com/3dapp/public/Orca-Flashforge/appInfo.json";
+// de-cloud: neutered plaintext-HTTP ishare3d update endpoint fallback
+static const std::string VERSION_CHECK_URL = "";
 static const std::string PROFILE_UPDATE_URL = "about:blank";
 static const std::string MODELS_STR = "models";
 
@@ -429,6 +430,9 @@ void AppConfig::set_defaults()
 
 void AppConfig::set_version_check_url()
 {
+    // de-cloud: do not configure any plaintext-HTTP Chinese update endpoint (ishare3d / sz3dp)
+    set("version_check_url", "");
+    return;
     std::string url1 = "http://update.cn.sz3dp.com:20080/3dapp/public/Orca-Flashforge/appInfo.json";
     std::string url2 = "http://www.ishare3d.com/3dapp/public/Orca-Flashforge/appInfo.json";
 #if 0

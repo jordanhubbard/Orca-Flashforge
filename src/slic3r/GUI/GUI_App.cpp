@@ -2005,6 +2005,8 @@ void GUI_App::init_download_path()
 
 void GUI_App::init_flashnetwork()
 {
+    // de-cloud: do not load the closed-source FlashNetwork library (kills all lib-routed cloud + telemetry)
+    return;
     wxFileName appFileName(wxStandardPaths::Get().GetExecutablePath());
     std::string appPathWithSep = appFileName.GetPathWithSep().ToUTF8().data();
 #ifdef _WIN32
@@ -4055,6 +4057,8 @@ bool GUI_App::check_login()
 
 bool GUI_App::auto_login_flashforge()
 {
+    // de-cloud: disable silent auto cloud login/connect at startup
+    return false;
     std::string access_token = app_config->get("access_token");
     std::string refresh_token = app_config->get("refresh_token");
     std::string token_expire_time = app_config->get("token_expire_time");
@@ -4505,7 +4509,7 @@ std::string GUI_App::handle_web_request(std::string cmd)
                 }
             }
             else if (command_str.compare("track_shopify_click") == 0) {
-                MultiComHelper::inst()->userClickCount("shopify", ComTimeoutWanB);
+                // de-cloud: removed userClickCount telemetry beacon
             }
             else if (command_str.compare("unknown_benefits") == 0) {
                 CallAfter([this]() {
@@ -4521,7 +4525,7 @@ std::string GUI_App::handle_web_request(std::string cmd)
                         m_ff_did = did.value();
                         m_ff_sid = sid.value();
                     }
-                    report_tracking_data_start_exit(true);
+                    // de-cloud: removed report_tracking_data_start_exit(true) telemetry beacon
                 }
             }
             else if (command_str.compare("open_model_detail") == 0) {
@@ -4563,7 +4567,8 @@ void GUI_App::handle_login_result(const std::string &token, const com_add_wan_de
     }
     m_login_success = true;
     LoginDialog::SetUsrLogin(true);
-    if (white_dlg) {
+    // de-cloud: skip update.flashforge.com whitelist request (leaks uid) and its marketing popup
+    if (false && white_dlg) {
         if (app_config->get("check_version_test").empty()) {
             app_config->set_bool("check_version_test", false);
         }
@@ -4879,6 +4884,8 @@ void  GUI_App::onAutoStartLogin(wxCommandEvent& event)
 
 void GUI_App::start_report_tracking_data_exit_thread()
 {
+    // de-cloud: no telemetry beacon on exit
+    return;
     m_report_tracking_data_exit_thd = std::thread([this]() {
         report_tracking_data_start_exit(false);
     });
@@ -4886,6 +4893,8 @@ void GUI_App::start_report_tracking_data_exit_thread()
 
 void GUI_App::report_tracking_data_start_exit(bool isStart)
 {
+    // de-cloud: no telemetry beacon (start/exit tracking disabled)
+    return;
     if (m_ff_did.empty() || m_ff_sid.empty()) {
         return;
     }
@@ -5181,6 +5190,8 @@ Semver get_version(const std::string& str, const std::regex& regexp) {
 
 void GUI_App::check_new_version_sf(bool by_user, bool use_uid)
 {
+    // de-cloud: disable update check (no request to update.flashforge.com, no entity_id=<uid> leak)
+    return;
     if (mainframe == nullptr || mainframe->is_shutdown()) {
         return;
     }

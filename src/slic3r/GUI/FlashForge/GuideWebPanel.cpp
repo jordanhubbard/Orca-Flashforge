@@ -10,7 +10,8 @@ namespace Slic3r { namespace GUI {
 wxDEFINE_EVENT(EVT_LOADING_TIMEOUT, wxCommandEvent);
 
 GuideWebPanel::GuideWebPanel(wxWindow* parent, wxWindowID id) : 
-	wxPanel(parent, id, wxDefaultPosition, wxDefaultSize), m_url("https://api.fdmcloud.flashforge.com/wiki/index.html")
+	// de-cloud: do not auto-load remote fdmcloud wiki page
+	wxPanel(parent, id, wxDefaultPosition, wxDefaultSize), m_url("about:blank")
 { 
     auto language = wxGetApp().app_config->get_language_code();
     if (language == "zh-cn") {
