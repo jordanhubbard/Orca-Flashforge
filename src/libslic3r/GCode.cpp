@@ -5308,7 +5308,15 @@ std::string GCode::_extrude(const ExtrusionPath &path, std::string description, 
         } else if (path.role() == erTopSolidInfill) {
             speed = m_config.get_abs_value("top_surface_speed");
         } else if (path.role() == erIroning) {
+            // ORCA: backport of OrcaSlicer per-filament ironing overrides (issue #36).
+            // Resolve the ironing print speed for the current filament: use the per-filament
+            // override when it is set, otherwise fall back to the global ironing_speed.
             speed = m_config.get_abs_value("ironing_speed");
+            if (const Extruder *ironing_extruder = m_writer.extruder(); ironing_extruder != nullptr) {
+                const unsigned int ironing_extruder_id = ironing_extruder->id();
+                if (!m_config.filament_ironing_speed.is_nil(ironing_extruder_id))
+                    speed = m_config.filament_ironing_speed.get_at(ironing_extruder_id);
+            }
         } else if (path.role() == erBottomSurface) {
             speed = m_config.get_abs_value("initial_layer_infill_speed");
         } else if (path.role() == erGapFill) {

@@ -3272,6 +3272,56 @@ void PrintConfigDef::init_fff_params()
     def->mode = comAdvanced;
     def->set_default_value(new ConfigOptionFloat(20));
 
+    // ORCA: backport of OrcaSlicer per-filament ironing overrides (issue #36).
+    // These nullable per-extruder options override the global ironing_* values
+    // above when set for a filament; a nil value falls back to the global value.
+    def = this->add("filament_ironing_flow", coPercents);
+    def->label = L("Ironing flow");
+    def->category = L("Quality");
+    def->tooltip = L("Filament-specific override for ironing flow. This allows you to customize the ironing flow "
+                     "for each filament type. Too high value results in overextrusion on the surface.");
+    def->sidetext = "%";
+    def->min = 0;
+    def->max = 100;
+    def->mode = comAdvanced;
+    def->nullable = true;
+    def->set_default_value(new ConfigOptionPercentsNullable{ ConfigOptionPercentsNullable::nil_value() });
+
+    def = this->add("filament_ironing_spacing", coFloats);
+    def->label = L("Ironing line spacing");
+    def->category = L("Quality");
+    def->tooltip = L("Filament-specific override for ironing line spacing. This allows you to customize the spacing "
+                     "between ironing lines for each filament type.");
+    def->sidetext = L("mm");
+    def->min = 0;
+    def->max = 1;
+    def->mode = comAdvanced;
+    def->nullable = true;
+    def->set_default_value(new ConfigOptionFloatsNullable{ ConfigOptionFloatsNullable::nil_value() });
+
+    def = this->add("filament_ironing_inset", coFloats);
+    def->label = L("Ironing inset");
+    def->category = L("Quality");
+    def->tooltip = L("Filament-specific override for ironing inset. This allows you to customize the distance to keep "
+                     "from the edges when ironing for each filament type.");
+    def->sidetext = L("mm");
+    def->min = 0;
+    def->max = 100;
+    def->mode = comAdvanced;
+    def->nullable = true;
+    def->set_default_value(new ConfigOptionFloatsNullable{ ConfigOptionFloatsNullable::nil_value() });
+
+    def = this->add("filament_ironing_speed", coFloats);
+    def->label = L("Ironing speed");
+    def->category = L("Speed");
+    def->tooltip = L("Filament-specific override for ironing speed. This allows you to customize the print speed "
+                     "of ironing lines for each filament type.");
+    def->sidetext = L("mm/s");
+    def->min = 1;
+    def->mode = comAdvanced;
+    def->nullable = true;
+    def->set_default_value(new ConfigOptionFloatsNullable{ ConfigOptionFloatsNullable::nil_value() });
+
     def           = this->add("ironing_angle", coFloat);
     def->label    = L("Ironing angle");
     def->category = L("Quality");

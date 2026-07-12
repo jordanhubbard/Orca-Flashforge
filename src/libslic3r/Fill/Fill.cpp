@@ -1207,10 +1207,22 @@ void Layer::make_ironing()
 			if (ironing_params.extruder != -1) {
 				//TODO just_infill is currently not used.
 				ironing_params.just_infill 	= false;
-				ironing_params.line_spacing = config.ironing_spacing;
-                ironing_params.inset 		= config.ironing_inset;
-				ironing_params.height 		= default_layer_height * 0.01 * config.ironing_flow;
-				ironing_params.speed 		= config.ironing_speed;
+				// ORCA: backport of OrcaSlicer per-filament ironing overrides (issue #36).
+				// Use the per-filament override for the ironing extruder when set, otherwise
+				// fall back to the global (process) ironing_* value. extruder is 1-based.
+				const size_t ironing_extruder_idx = ironing_params.extruder - 1;
+				ironing_params.line_spacing = (!config.filament_ironing_spacing.is_nil(ironing_extruder_idx)
+					? config.filament_ironing_spacing.get_at(ironing_extruder_idx)
+					: config.ironing_spacing);
+                ironing_params.inset 		= (!config.filament_ironing_inset.is_nil(ironing_extruder_idx)
+					? config.filament_ironing_inset.get_at(ironing_extruder_idx)
+					: config.ironing_inset);
+				ironing_params.height 		= default_layer_height * 0.01 * (!config.filament_ironing_flow.is_nil(ironing_extruder_idx)
+					? config.filament_ironing_flow.get_at(ironing_extruder_idx)
+					: config.ironing_flow);
+				ironing_params.speed 		= (!config.filament_ironing_speed.is_nil(ironing_extruder_idx)
+					? config.filament_ironing_speed.get_at(ironing_extruder_idx)
+					: config.ironing_speed);
                 ironing_params.angle        = (config.ironing_angle >= 0 ? config.ironing_angle : config.infill_direction) * M_PI / 180.;
 				ironing_params.pattern      = config.ironing_pattern;
 				ironing_params.layerm 		= layerm;

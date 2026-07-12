@@ -961,6 +961,12 @@ PRINT_CONFIG_CLASS_DEFINE(
     ((ConfigOptionFloat, ironing_direction))
     ((ConfigOptionFloat, ironing_speed))
     ((ConfigOptionFloat, ironing_angle))
+    // ORCA: backport of OrcaSlicer per-filament ironing overrides (issue #36).
+    // Nullable per-extruder vectors: nil means "use the global ironing_* value".
+    ((ConfigOptionPercentsNullable, filament_ironing_flow))
+    ((ConfigOptionFloatsNullable, filament_ironing_spacing))
+    ((ConfigOptionFloatsNullable, filament_ironing_inset))
+    ((ConfigOptionFloatsNullable, filament_ironing_speed))
     // Detect bridging perimeters
     ((ConfigOptionBool, detect_overhang_wall))
     ((ConfigOptionInt, wall_filament))
