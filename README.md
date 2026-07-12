@@ -10,6 +10,11 @@ Orca-Flashforge is an open source slicer for FDM printers.
   - Tools needed: Xcode, CMake, Git, gettext, Automake, Perl
   - run `build_release_macos.sh`
 
+- Linux (checked on Ubuntu Desktop 22.04 6.8.0-57-generic x86_64)  
+  - Tools needed: [docker](https://docs.docker.com/engine/install/ubuntu/)
+  - run `sh ./DockerBuild.sh`
+  - after successful build run it from docker via `sh DockerRun.sh` or export AppImage from `orcaslicer` container to your local file system
+
 # License
 Orca-Flashforge is licensed under the GNU Affero General Public License, version 3. Orca-Flashforge is based on Orca Slicer by SoftFever.
 
