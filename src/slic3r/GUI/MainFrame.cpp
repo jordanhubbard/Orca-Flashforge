@@ -1205,7 +1205,8 @@ void MainFrame::init_tabpanel() {
 
         //BBS add pages
     m_monitor = new MonitorPanel(m_tabpanel, wxID_ANY, wxDefaultPosition, wxDefaultSize);
-    m_monitor->SetBackgroundColour(*wxWHITE);
+    // #35 dark mode: theme-aware background so the Device tab darkens with the app
+    m_monitor->SetBackgroundColour(StateColor::darkModeColorFor(*wxWHITE));
     m_tabpanel->AddPage(m_monitor, _L("Device"), std::string("tab_monitor_active"), std::string("tab_monitor_inactive"), false);
 
     m_printer_view = new PrinterWebView(m_tabpanel);
@@ -2340,6 +2341,11 @@ void MainFrame::on_sys_color_changed()
     // BBS
     m_tabpanel->Rescale();
     m_param_panel->msw_rescale();
+
+    // #35 dark mode: the custom-drawn header bar isn't re-themed by the widget-tree
+    // recursion, so refresh it explicitly here.
+    if (m_topbar)
+        m_topbar->sys_color_changed();
 
     // update Plater
     wxGetApp().plater()->sys_color_changed();

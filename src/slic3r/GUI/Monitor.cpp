@@ -267,9 +267,12 @@ wxWindow* MonitorPanel::create_side_tools()
 
 void MonitorPanel::on_sys_color_changed()
 {
-    //m_status_info_panel->on_sys_color_changed();
-    //m_upgrade_panel->on_sys_color_changed();
-    //m_media_file_panel->Rescale();
+    // #35 dark mode: the Device tab subtree (device list + single-device state) was never
+    // re-themed on a dark/light toggle, so it kept its light backgrounds. Recurse the theme
+    // over this panel and all of its children, then repaint so custom-drawn panels update.
+    wxGetApp().UpdateDarkUIWin(this);
+    Layout();
+    Refresh();
 }
 
 void MonitorPanel::msw_rescale()
