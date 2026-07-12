@@ -3170,6 +3170,57 @@ void TabFilament::add_filament_overrides_page()
                                         // "filament_seam_gap"
                                      })
         append_single_option_line(opt_key, extruder_idx);
+
+    // ORCA: backport of OrcaSlicer per-filament ironing overrides (issue #36).
+    // These override the process (print preset) ironing_* values, so - unlike the
+    // retraction overrides above - the "N/A" fallback is pulled from the print
+    // preset rather than the printer preset.
+    ConfigOptionsGroupShp ironing_optgroup = page->new_optgroup(L("Ironing"), L"param_ironing");
+    auto append_ironing_option = [ironing_optgroup, this](const std::string& opt_key, int opt_index)
+    {
+        Line line {"",""};
+        line = ironing_optgroup->create_single_option_line(ironing_optgroup->get_option(opt_key));
+
+        line.near_label_widget = [this, optgroup_wk = ConfigOptionsGroupWkp(ironing_optgroup), opt_key, opt_index](wxWindow* parent) {
+            wxCheckBox* check_box = new wxCheckBox(parent, wxID_ANY, "");
+
+            check_box->Bind(
+                wxEVT_CHECKBOX,
+                [this, optgroup_wk, opt_key, opt_index](wxCommandEvent& evt) {
+                const bool is_checked = evt.IsChecked();
+                if (auto optgroup_sh = optgroup_wk.lock(); optgroup_sh) {
+                    if (Field *field = optgroup_sh->get_fieldc(opt_key, opt_index); field != nullptr) {
+                        field->toggle(is_checked);
+
+                        if (is_checked) {
+                            field->update_na_value(_(L("N/A")));
+                            field->set_last_meaningful_value();
+                        }
+                        else {
+                            // ORCA: ironing base values live in the print (process) preset.
+                            const std::string process_opt_key = opt_key.substr(strlen("filament_"));
+                            const auto process_config = m_preset_bundle->prints.get_edited_preset().config;
+                            const boost::any process_config_value = optgroup_sh->get_config_value(process_config, process_opt_key, opt_index);
+                            field->update_na_value(process_config_value);
+                            field->set_na_value();
+                        }
+                    }
+                }
+            }, check_box->GetId());
+
+            m_overrides_options[opt_key] = check_box;
+            return check_box;
+        };
+
+        ironing_optgroup->append_line(line);
+    };
+
+    for (const std::string opt_key : {  "filament_ironing_flow",
+                                        "filament_ironing_spacing",
+                                        "filament_ironing_inset",
+                                        "filament_ironing_speed"
+                                     })
+        append_ironing_option(opt_key, extruder_idx);
 }
 
 void TabFilament::update_filament_overrides_page(const DynamicPrintConfig* printers_config)
@@ -3244,6 +3295,45 @@ void TabFilament::update_filament_overrides_page(const DynamicPrintConfig* print
                 boost::any printer_config_value = optgroup->get_config_value(*printers_config, printer_opt_key, extruder_idx);
                 field->update_na_value(printer_config_value);
                 field->set_value(printer_config_value, false);
+            }
+
+            field->toggle(is_checked);
+        }
+    }
+
+    // ORCA: backport of OrcaSlicer per-filament ironing overrides (issue #36).
+    const auto og_ironing_it = std::find_if(page->m_optgroups.begin(), page->m_optgroups.end(), [](const ConfigOptionsGroupShp og) { return og->title == "Ironing"; });
+    if (og_ironing_it != page->m_optgroups.end())
+    {
+        ConfigOptionsGroupShp ironing_optgroup = *og_ironing_it;
+
+        const std::vector<std::string> ironing_opt_keys = {
+            "filament_ironing_flow",
+            "filament_ironing_spacing",
+            "filament_ironing_inset",
+            "filament_ironing_speed"
+        };
+
+        // Ironing base values come from the print (process) preset, not the printer preset.
+        const auto process_config = m_preset_bundle->prints.get_edited_preset().config;
+
+        for (const std::string& opt_key : ironing_opt_keys)
+        {
+            if (m_overrides_options.find(opt_key) == m_overrides_options.end())
+                continue;
+
+            bool is_checked = !dynamic_cast<ConfigOptionVectorBase*>(m_config->option(opt_key))->is_nil(extruder_idx);
+            m_overrides_options[opt_key]->Enable(true);
+            m_overrides_options[opt_key]->SetValue(is_checked);
+
+            Field* field = ironing_optgroup->get_fieldc(opt_key, extruder_idx);
+            if (field == nullptr) continue;
+
+            if (!is_checked) {
+                const std::string process_opt_key = opt_key.substr(strlen("filament_"));
+                const boost::any process_config_value = ironing_optgroup->get_config_value(process_config, process_opt_key, extruder_idx);
+                field->update_na_value(process_config_value);
+                field->set_value(process_config_value, false);
             }
 
             field->toggle(is_checked);
