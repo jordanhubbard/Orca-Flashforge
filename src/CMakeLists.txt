@@ -93,8 +93,10 @@ if (SLIC3R_GUI)
 
     # This fixes a OpenGL linking issue on OSX. wxWidgets cmake build includes
     # wrong libs for opengl in the link line and it does not link to it by himself.
-    # libslic3r_gui will link to opengl anyway, so lets override wx
-    list(FILTER wxWidgets_LIBRARIES EXCLUDE REGEX OpenGL)
+    # libslic3r_gui will link to opengl anyway, so lets override wx.
+    # Note: if a Homebrew "mesa" is installed, wx-config emits bare "libGL.dylib"/
+    # "libGLU.dylib" (which become an unresolvable -lGL/-lGLU); strip those too.
+    list(FILTER wxWidgets_LIBRARIES EXCLUDE REGEX "OpenGL|libGLU?\\.dylib")
 
 #    list(REMOVE_ITEM wxWidgets_LIBRARIES oleacc)
     message(STATUS "wx libs: ${wxWidgets_LIBRARIES}")

@@ -20,6 +20,18 @@ diff -u ../libpng-1.6.35-orig/pngrutil.c ./pngrutil.c
        if (ret == Z_OK)
           png_ptr->zowner = owner;
  
+diff -u ../libpng-1.6.35-orig/pngpriv.h ./pngpriv.h
+--- ../libpng-1.6.35-orig/pngpriv.h
++++ ./pngpriv.h
+@@ -521,7 +521,7 @@
+     * <fp.h> if possible.
+     */
+ #    if !defined(__MATH_H__) && !defined(__MATH_H) && !defined(__cmath__)
+-#      include <fp.h>
++#      include <math.h>
+ #    endif
+ #  else
+ #    include <math.h>
 Common subdirectories: ../libpng-1.6.35-orig/powerpc and ./powerpc
 Common subdirectories: ../libpng-1.6.35-orig/projects and ./projects
 Common subdirectories: ../libpng-1.6.35-orig/scripts and ./scripts

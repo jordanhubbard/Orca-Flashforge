@@ -4,7 +4,10 @@ if (APPLE)
     message(STATUS "Compiling TIFF for macos ${CMAKE_SYSTEM_VERSION}.")
     orcaslicer_add_cmake_project(TIFF
         URL https://gitlab.com/libtiff/libtiff/-/archive/v4.3.0/libtiff-v4.3.0.zip
-        URL_HASH SHA256=4fca1b582c88319f3ad6ecd5b46320eadaf5eb4ef6f6c32d44caaae4a03d0726
+        # GitLab regenerates archive tarballs with different compression over time,
+        # so the original pinned SHA256 no longer matches. Re-pinned to the current
+        # archive (verified to contain genuine libtiff v4.3.0 source).
+        URL_HASH SHA256=455abecf8fba9754b80f8eff01c3ef5b24a3872ffce58337a59cba38029f0eca
         DEPENDS ${ZLIB_PKG} ${PNG_PKG} dep_JPEG
         CMAKE_ARGS
             -Dlzma:BOOL=OFF
