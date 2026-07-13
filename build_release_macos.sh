@@ -3,6 +3,13 @@
 set -e
 set -o pipefail
 
+# CMake 4 removed compatibility with cmake_minimum_required(VERSION < 3.5). Several
+# bundled deps -- and nested try_compile projects they run internally (e.g. wxWidgets'
+# cotire test) -- still declare old floors. Exporting this makes EVERY cmake in the
+# build tree accept them: the top-level configure, each dependency's ExternalProject
+# configure, and nested try_compile invocations that per-command -D flags cannot reach.
+export CMAKE_POLICY_VERSION_MINIMUM=3.5
+
 while getopts ":dpa:snt:xbc:hu" opt; do
   case "${opt}" in
     d )
