@@ -29,8 +29,13 @@ else ()
         URL_HASH SHA256=b9df93635b20e4089c29623b19420c4ac848a1b29df1cfd59f26cab0d2666aa0
         DOWNLOAD_DIR ${DEP_DOWNLOAD_DIR}/MPFR
         BUILD_IN_SOURCE ON
-        CONFIGURE_COMMAND autoreconf -f -i && 
-                          env "CFLAGS=${_gmp_ccflags}" "CXXFLAGS=${_gmp_ccflags}" ./configure ${_cross_compile_arg} --prefix=${DESTDIR} --enable-shared=no --enable-static=yes --with-gmp=${DESTDIR} ${_gmp_build_tgt}
+        # Use MPFR's shipped, pre-generated configure. Regenerating it with
+        # `autoreconf -f -i` depends on the *system* autoconf, and newer autoconf
+        # (e.g. 2.73) emits a configure whose AC_PROG_CC / C23 probe is broken on
+        # current Apple clang, failing with a bogus "C compiler cannot create
+        # executables". There is no patched configure.ac here, so autoreconf is
+        # unnecessary; the shipped configure builds cleanly.
+        CONFIGURE_COMMAND env "CFLAGS=${_gmp_ccflags}" "CXXFLAGS=${_gmp_ccflags}" ./configure ${_cross_compile_arg} --prefix=${DESTDIR} --enable-shared=no --enable-static=yes --with-gmp=${DESTDIR} ${_gmp_build_tgt}
         BUILD_COMMAND make -j
         INSTALL_COMMAND make install
         DEPENDS dep_GMP

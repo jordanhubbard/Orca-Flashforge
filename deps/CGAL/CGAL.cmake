@@ -9,7 +9,10 @@ orcaslicer_add_cmake_project(
     # Clang 16+/21 instantiates a broken safe-bool operator in CGAL's halfedge
     # iterators (this->base() with no base class). Patch it to match the correct
     # sibling iterators in the same header.
-    PATCH_COMMAND ${CMAKE_COMMAND} -DCGAL_ITERATOR_H=<SOURCE_DIR>/include/CGAL/boost/graph/iterator.h -P ${CMAKE_CURRENT_LIST_DIR}/fix-cgal-iterator-base.cmake
+    # NB: the v5.4 GitHub source archive uses CGAL's per-package layout, so this
+    # header lives under BGL/include/..., not a flat include/... (which only the
+    # release tarball has). The old flat path made the patch fail on a clean build.
+    PATCH_COMMAND ${CMAKE_COMMAND} -DCGAL_ITERATOR_H=<SOURCE_DIR>/BGL/include/CGAL/boost/graph/iterator.h -P ${CMAKE_CURRENT_LIST_DIR}/fix-cgal-iterator-base.cmake
 )
 
 include(GNUInstallDirs)
