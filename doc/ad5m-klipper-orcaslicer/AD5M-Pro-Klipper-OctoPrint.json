@@ -1,0 +1,35 @@
+{
+    "type": "machine",
+    "name": "AD5M Pro Klipper (OctoPrint)",
+    "from": "User",
+    "instantiation": "true",
+    "inherits": "fdm_klipper_common",
+    "printer_model": "Generic Klipper Printer",
+    "printer_variant": "0.4",
+    "nozzle_diameter": [
+        "0.4"
+    ],
+    "gcode_flavor": "klipper",
+    "printable_area": [
+        "-110x-110",
+        "110x-110",
+        "110x110",
+        "-110x110"
+    ],
+    "printable_height": "220",
+    "machine_start_gcode": "START_PRINT BED_TEMP=[bed_temperature_initial_layer_single] EXTRUDER_TEMP=[nozzle_temperature_initial_layer]",
+    "machine_end_gcode": "END_PRINT",
+    "machine_max_speed_x": [
+        "600"
+    ],
+    "machine_max_speed_y": [
+        "600"
+    ],
+    "machine_max_speed_z": [
+        "20"
+    ],
+    "host_type": "octoprint",
+    "print_host": "192.168.1.11:7125",
+    "print_host_webui": "http://192.168.1.11:4000",
+    "bbl_use_print_host_webui": "1"
+}
