@@ -5,6 +5,11 @@ set(DEP_WERRORS_SDK "-Werror=partial-availability -Werror=unguarded-availability
 
 set(DEP_CMAKE_OPTS
     "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
+    # CMake 4 removed compatibility with cmake_minimum_required(VERSION < 3.5).
+    # Many bundled deps (Cereal, NLopt, OpenVDB, ...) still declare old floors and
+    # each ExternalProject runs its own cmake, so this must be passed to every
+    # sub-configure, not just the top-level deps/slicer configure.
+    "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
     "-DCMAKE_OSX_SYSROOT=${CMAKE_OSX_SYSROOT}"
     "-DCMAKE_OSX_DEPLOYMENT_TARGET=${DEP_OSX_TARGET}"
     "-DCMAKE_CXX_FLAGS=${DEP_WERRORS_SDK}"
