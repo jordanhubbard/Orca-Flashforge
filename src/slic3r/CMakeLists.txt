@@ -86,6 +86,10 @@ set(SLIC3R_GUI_SOURCES
     GUI/Widgets/ErrorMsgStaticText.hpp
     GUI/AboutDialog.cpp
     GUI/AboutDialog.hpp
+    GUI/AISettingsDialog.cpp
+    GUI/AISettingsDialog.hpp
+    GUI/AISlicerDialog.cpp
+    GUI/AISlicerDialog.hpp
     GUI/NetworkTestDialog.cpp
     GUI/NetworkTestDialog.hpp
     GUI/AuxiliaryDialog.cpp
@@ -460,6 +464,12 @@ set(SLIC3R_GUI_SOURCES
     Config/Snapshot.hpp
     Config/Version.cpp
     Config/Version.hpp
+    Utils/AIProvider.cpp
+    Utils/AIProvider.hpp
+    Utils/AIPrinterContext.cpp
+    Utils/AIPrinterContext.hpp
+    Utils/AIShapeGen.cpp
+    Utils/AIShapeGen.hpp
     Utils/ASCIIFolding.cpp
     Utils/ASCIIFolding.hpp
     GUI/ConfigWizard.cpp
