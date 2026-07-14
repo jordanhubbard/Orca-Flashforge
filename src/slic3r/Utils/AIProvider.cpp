@@ -66,6 +66,17 @@ std::string strip_trailing_slash(std::string s)
     return s;
 }
 
+// Join an API base URL with a versioned path without doubling the "/v1" segment.
+// OpenAI's base is given without it ("https://api.openai.com"), but many gateways
+// are entered WITH it ("https://.../v1"). `path` is like "/chat/completions".
+std::string api_url(const std::string &base, const std::string &path)
+{
+    std::string b = strip_trailing_slash(base);
+    if (b.size() >= 3 && b.compare(b.size() - 3, 3, "/v1") == 0)
+        return b + path;
+    return b + "/v1" + path;
+}
+
 // Turn any failed HttpResult into a concise, user-facing message.
 std::string http_error_message(const HttpResult &r)
 {
@@ -122,7 +133,7 @@ public:
         }
         body["messages"] = std::move(msgs);
 
-        auto http = Http::post(m_base + "/v1/chat/completions");
+        auto http = Http::post(api_url(m_base, "/chat/completions"));
         http.header("Authorization", "Bearer " + m_cfg.api_key);
         http.header("Content-Type", "application/json");
         http.set_post_body(body.dump());
@@ -148,7 +159,7 @@ public:
 
     bool get_models(std::vector<AIModelInfo> &models, std::string &error_msg) const override
     {
-        auto http = Http::get(m_base + "/v1/models");
+        auto http = Http::get(api_url(m_base, "/models"));
         http.header("Authorization", "Bearer " + m_cfg.api_key);
         HttpResult r = http_send(std::move(http));
         if (! r.ok || ! status_ok(r.status)) { error_msg = http_error_message(r); return false; }
@@ -217,7 +228,7 @@ public:
         if (! system.empty())
             body["system"] = system;
 
-        auto http = Http::post(m_base + "/v1/messages");
+        auto http = Http::post(api_url(m_base, "/messages"));
         http.header("x-api-key", m_cfg.api_key);
         http.header("anthropic-version", "2023-06-01");
         http.header("Content-Type", "application/json");
@@ -249,7 +260,7 @@ public:
 
     bool get_models(std::vector<AIModelInfo> &models, std::string &error_msg) const override
     {
-        auto http = Http::get(m_base + "/v1/models");
+        auto http = Http::get(api_url(m_base, "/models"));
         http.header("x-api-key", m_cfg.api_key);
         http.header("anthropic-version", "2023-06-01");
         HttpResult r = http_send(std::move(http));
